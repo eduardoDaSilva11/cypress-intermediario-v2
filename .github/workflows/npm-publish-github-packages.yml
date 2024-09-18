@@ -1,0 +1,52 @@
+name: Cypress-intermdiario-v2
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  cypress-docker:
+    runs-on: ubuntu-latest
+    
+    services:
+      docker:
+        image: wlsf82/gitlab-ce:latest  
+        options: --privileged --health-cmd "curl http://localhost || exit 1" --health-interval 10s --health-timeout 5s --health-retries 5
+        ports:
+          - 80:80
+          - 443:443
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'  
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Set up environment variables
+      run: |
+        echo '{
+          "user_name": "${{ secrets.USER_NAME }}", 
+          "user_password": "${{ secrets.USER_PASSWORD }}", 
+          "gitlab_access_token": "${{ secrets.GITLAB_ACCESS_TOKEN }}"
+        }' > cypress.env.json
+      env:
+        CYPRESS_baseUrl: http://localhost
+        CYPRESS_hideCredentials: true
+        CYPRESS_requestMode: true
+
+    - name: Run Cypress tests
+      run: npx cypress run
+      env:
+        CYPRESS_baseUrl: http://localhost
