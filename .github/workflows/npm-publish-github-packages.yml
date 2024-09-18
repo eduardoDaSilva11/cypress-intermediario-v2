@@ -18,7 +18,7 @@ jobs:
         options: --privileged --health-cmd "curl http://localhost || exit 1" --health-interval 30s --health-timeout 10s --health-retries 10
         ports:
           - 80:80
-          - 22:22
+          - 443:443
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock
 
