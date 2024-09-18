@@ -19,6 +19,9 @@ jobs:
       - name: Build Docker image
         run: docker build -t wlsf82/gitlab-ce .
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Run Cypress tests
-        run: docker run --rm -e CYPRESS_baseUrl=http://localhost \
-                          wlsf82/gitlab-ce
+        run: npm run test
+
