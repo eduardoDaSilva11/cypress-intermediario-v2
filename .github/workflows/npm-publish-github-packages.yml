@@ -1,4 +1,4 @@
-name: Cypress-intermdiario-v2
+name: Cypress-intermediario-v2
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
     services:
       docker:
         image: wlsf82/gitlab-ce:latest  
-        options: --privileged --health-cmd "curl http://localhost || exit 1" --health-interval 10s --health-timeout 5s --health-retries 5
+        options: --privileged --health-cmd "curl http://localhost || exit 1" --health-interval 30s --health-timeout 10s --health-retries 10
         ports:
           - 80:80
           - 443:443
@@ -29,10 +29,16 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16'  
+        node-version: '16'
 
     - name: Install dependencies
       run: npm install
+
+    - name: Wait for Docker services to be ready
+      run: sleep 60
+
+    - name: Check Docker logs (optional for debugging)
+      run: docker logs $(docker ps -q --filter "ancestor=wlsf82/gitlab-ce:latest")
 
     - name: Set up environment variables
       run: |
@@ -48,5 +54,4 @@ jobs:
 
     - name: Run Cypress tests
       run: npx cypress run
-      env:
-        CYPRESS_baseUrl: http://localhost
+
